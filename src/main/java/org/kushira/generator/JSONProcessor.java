@@ -101,11 +101,11 @@ public class JSONProcessor extends AbstractProcessor {
                 } else if ((matcher = isCollection(this.processingEnv.getTypeUtils().directSupertypes(fieldType))) != null) {
                     String dataType = matcher.group(2);
                     toStringBuilder.append(".append(\"[\");");
-                    toStringBuilder.append(field.getSimpleName()).append(".forEach( ");
+                    toStringBuilder.append(field.getSimpleName()).append(".forEach(value -> ");
                     if (PRIMITIVE_CLASSES.contains(dataType) || annotatedClasses.contains(dataType)) {
-                        toStringBuilder.append("builder::append");
+                        toStringBuilder.append("builder.append(value)").append(".append(\",\")");
                     } else {
-                        toStringBuilder.append("value ->").append("builder.append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")");
+                        toStringBuilder.append("builder.append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")").append(".append(\",\")");
                     }
                     toStringBuilder.append(");");
                     toStringBuilder.append("builder.append(\"]\")");
@@ -115,12 +115,14 @@ public class JSONProcessor extends AbstractProcessor {
                     toStringBuilder.append(field.getSimpleName()).append(".forEach((key, value) -> ");
                     toStringBuilder.append("builder.append(\"\\\"\")").append(".append(key)").append(".append(\"\\\"\")").append(".append(\":\")");
                     if (PRIMITIVE_CLASSES.contains(dataType) || annotatedClasses.contains(dataType)) {
-                        toStringBuilder.append(".append(value)");
+                        toStringBuilder.append(".append(value)").append(".append(\",\")");
                     } else {
-                        toStringBuilder.append(".append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")");
+                        toStringBuilder.append(".append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")").append(".append(\",\")");
                     }
                     toStringBuilder.append(");");
                     toStringBuilder.append("builder.append(\"}\")");
+                } else {
+                    toStringBuilder.append(".append(\"\\\"\")").append(".append(").append(field.getSimpleName()).append(")").append(".append(\"\\\"\")");
                 }
                 hasPrevious = true;
                 blockStmt.addAndGetStatement(toStringBuilder.toString());
