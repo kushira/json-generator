@@ -7,8 +7,6 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
-import org.gradle.api.internal.tasks.compile.processing.ElementUtils;
-import org.kushira.generator.annotation.JSONToString;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -16,26 +14,15 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
-import javax.lang.model.util.Types;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -80,24 +67,6 @@ public class JSONProcessor extends AbstractProcessor {
 
         for (Element element : allElements) {
             TypeElement typeElement = (TypeElement) element;
-            for (Element element1 : typeElement.getEnclosedElements()) {
-//                System.out.println(element1.getSimpleName());
-//                System.out.println(element1.getKind());
-                if (element1.getKind() == ElementKind.FIELD) {
-//                    System.out.println(element1.getKind());
-//                    TypeElement typeElement1 = (TypeElement) element1;
-                    VariableElement variableElement = (VariableElement) element1;
-                    TypeMirror fieldType = variableElement.asType();
-//                    System.out.println(fieldType.toString());
-//                    System.out.println(isCollection(this.processingEnv.getTypeUtils().directSupertypes(fieldType)));
-//                    System.out.println(this.processingEnv.getElementUtils().getTypeElement(Collection.class.getCanonicalName()));
-//                    System.out.println(this.processingEnv.getTypeUtils().isSubtype(fieldType,
-//                            this.processingEnv.getElementUtils().getTypeElement(Collection.class.getCanonicalName()).asType()));
-//                    System.out.println(annotatedClasses.contains(fieldType.toString()));
-//                    System.out.println(fieldType.getKind().isPrimitive());
-//                    System.out.println(PRIMITIVE_CLASSES.contains(fieldType.toString()));
-                }
-            }
             try {
                 generateToString(typeElement, annotatedClasses);
             } catch (IOException e) {

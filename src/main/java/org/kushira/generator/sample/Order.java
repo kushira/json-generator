@@ -1,6 +1,7 @@
 package org.kushira.generator.sample;
 
 import org.kushira.generator.annotation.JSONToString;
+
 import java.math.BigDecimal;
 
 @JSONToString
