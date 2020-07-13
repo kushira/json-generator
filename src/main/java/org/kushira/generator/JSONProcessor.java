@@ -91,36 +91,34 @@ public class JSONProcessor extends AbstractProcessor {
                 VariableElement variableElement = (VariableElement) field;
                 TypeMirror fieldType = variableElement.asType();
                 if (hasPrevious) {
-                    blockStmt.addAndGetStatement("builder.append(\",\")");
+                    toStringBuilder.append("builder.append(\",\")");
+                } else {
+                    toStringBuilder.append("builder");
                 }
-                toStringBuilder.append("builder.append(\"\\\"").append(field.getSimpleName()).append("\\\":\")");
+                toStringBuilder.append(".append(\"\\\"").append(field.getSimpleName()).append("\\\":\")");
                 if (annotatedClasses.contains(fieldType.toString())) {
                     toStringBuilder.append(".append(").append(field.getSimpleName()).append(")");
                 } else if (fieldType.getKind().isPrimitive() || PRIMITIVE_CLASSES.contains(fieldType.toString())) {
                     toStringBuilder.append(".append(").append(field.getSimpleName()).append(")");
                 } else if ((matcher = isCollection(this.processingEnv.getTypeUtils().directSupertypes(fieldType))) != null) {
                     String dataType = matcher.group(2);
-                    toStringBuilder.append(".append(\"[\");");
-                    toStringBuilder.append(field.getSimpleName()).append(".forEach(value -> ");
+                    toStringBuilder.append(".append(\"[\");").append(field.getSimpleName()).append(".forEach(value -> ");
                     if (PRIMITIVE_CLASSES.contains(dataType) || annotatedClasses.contains(dataType)) {
                         toStringBuilder.append("builder.append(value)").append(".append(\",\")");
                     } else {
                         toStringBuilder.append("builder.append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")").append(".append(\",\")");
                     }
-                    toStringBuilder.append(");");
-                    toStringBuilder.append("builder.append(\"]\")");
+                    toStringBuilder.append(");").append("builder.replace(builder.length()-1,builder.length(),\"]\")");
                 } else if (((matcher = isMap(fieldType)) != null) || ((matcher = isCollection(this.processingEnv.getTypeUtils().directSupertypes(fieldType))) != null)) {
                     String dataType = matcher.group(3);
-                    toStringBuilder.append(".append(\"{\");");
-                    toStringBuilder.append(field.getSimpleName()).append(".forEach((key, value) -> ");
-                    toStringBuilder.append("builder.append(\"\\\"\")").append(".append(key)").append(".append(\"\\\"\")").append(".append(\":\")");
+                    toStringBuilder.append(".append(\"{\");").append(field.getSimpleName()).append(".forEach((key, value) -> ")
+                            .append("builder.append(\"\\\"\")").append(".append(key)").append(".append(\"\\\"\")").append(".append(\":\")");
                     if (PRIMITIVE_CLASSES.contains(dataType) || annotatedClasses.contains(dataType)) {
                         toStringBuilder.append(".append(value)").append(".append(\",\")");
                     } else {
                         toStringBuilder.append(".append(\"\\\"\")").append(".append(value)").append(".append(\"\\\"\")").append(".append(\",\")");
                     }
-                    toStringBuilder.append(");");
-                    toStringBuilder.append("builder.append(\"}\")");
+                    toStringBuilder.append(");").append("builder.replace(builder.length()-1,builder.length(),\"}\")");
                 } else {
                     toStringBuilder.append(".append(\"\\\"\")").append(".append(").append(field.getSimpleName()).append(")").append(".append(\"\\\"\")");
                 }
